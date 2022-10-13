@@ -5,10 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.peliculas.adapter.BooksAdapter;
@@ -25,29 +22,32 @@ import com.example.peliculas.view.IMovieView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements IMovieView {
+public class ExtraActivity extends AppCompatActivity implements IMovieView, IBookView {
 
     private IMoviePresenter moviePresenter;
+    private IBookPresenter bookPresenter;
     private MoviesAdapter adapter;
+    private BooksAdapter booksAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_extra);
         this.moviePresenter = new MoviePresenter(this);
         this.moviePresenter.getMovies();
 
-        RecyclerView rvMovies = (RecyclerView) findViewById(R.id.list_movies);
+        RecyclerView rvMovies = (RecyclerView) findViewById(R.id.list_movies_Extra);
         this.adapter = new MoviesAdapter(new ArrayList<>());
         rvMovies.setAdapter(adapter);
         rvMovies.setLayoutManager(new LinearLayoutManager(this));
 
-        Button button = (Button) findViewById(R.id.extra_button);
-        button.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ExtraActivity.class);
-            startActivity(intent);
-        });
+        this.bookPresenter = new BookPresenter(this);
+        this.bookPresenter.getBooks();
 
+        RecyclerView rvBooks = (RecyclerView) findViewById(R.id.list_books_Extra);
+        this.booksAdapter = new BooksAdapter(new ArrayList<>());
+        rvBooks.setAdapter(booksAdapter);
+        rvBooks.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -61,4 +61,14 @@ public class MainActivity extends AppCompatActivity implements IMovieView {
                 .show();
     }
 
+    @Override
+    public void onBookSuccess(List<Book> books) {
+        booksAdapter.reloadData(books);
+    }
+
+    @Override
+    public void onBookError(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG)
+                .show();
+    }
 }
